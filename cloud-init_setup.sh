@@ -27,3 +27,16 @@ EOF
 
 # Limpar o estado anterior para permitir nova inicialização
 cloud-init clean --logs
+
+# Executar as etapas do Cloud-Init
+cloud-init init --local
+cloud-init init
+cloud-init modules --mode=config
+cloud-init modules --mode=final
+
+# Validar serviços e usuário
+systemctl is-active --quiet nginx
+systemctl is-active --quiet docker
+id meu-usuario
+
+echo "Provisionamento concluído."

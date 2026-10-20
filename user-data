@@ -1,18 +1,52 @@
 #cloud-config
 
 # Atualiza a lista de pacotes antes das instalações
-
+package_update: true
 
 # Cria um usuário administrador
-
+users:
+  - name: meu-usuario
+    gecos: Administrador da VM
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    groups:
+      - sudo
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+    - "chave_publica"
 
 # Instala os softwares declarativamente
+packages:
+  - openssh-server
+  - docker.io
+  - nginx
 
 
 # Cria uma página personalizada
+write_files:
+  - path: /var/www/html/index.html
+    owner: root:root
+    permissions: '0644'
+    content: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Bem-vindo ao Servidor Nginx</title>
+      </head>
+      <body>
+          <h1>Olá, mundo!</h1>
+          <p>Esta é uma página personalizada criada pelo cloud-init.</p>
+      </body>
+      </html>
 
 
 # Executa comandos após as etapas de configuração
-
+runcmd:
+  - [systemctl, enable, --now, nginx]
+  - [systemctl, enable, --now, docker]
+  - [usermod, -aG, docker, meu-usuario]
+  - [bash, -lc, "nginx -t"]
+  - [bash, -lc, "echo 'Cloud-Init: configuração concluída.' | tee /var/log/provisionamento-finalizado.log"]
 
 # Mensagem final registrada nos logs
+final_message: "Cloud-Init finalizado após $UPTIME segundos."
