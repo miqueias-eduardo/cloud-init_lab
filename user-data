@@ -13,7 +13,7 @@ users:
     shell: /bin/bash
     lock_passwd: true
     ssh_authorized_keys:
-    - "chave_publica"
+      - "ssh-ed25519 AAAAC3NzaC11ZDI1NTESAAAAIJpNTHkf4xNSh8vXZCTifn29QY/cZ8Ihue2kVJFd4vg/aluno@DESKTOP-IQRKVKU"
 
 # Instala os softwares declarativamente
 packages:
@@ -21,12 +21,11 @@ packages:
   - docker.io
   - nginx
 
-
 # Cria uma página personalizada
 write_files:
   - path: /var/www/html/index.html
     owner: root:root
-    permissions: '0644'
+    permissions: "0644"
     content: |
       <!DOCTYPE html>
       <html>
@@ -39,14 +38,17 @@ write_files:
       </body>
       </html>
 
-
 # Executa comandos após as etapas de configuração
 runcmd:
   - [systemctl, enable, --now, nginx]
   - [systemctl, enable, --now, docker]
   - [usermod, -aG, docker, meu-usuario]
   - [bash, -lc, "nginx -t"]
-  - [bash, -lc, "echo 'Cloud-Init: configuração concluída.' | tee /var/log/provisionamento-finalizado.log"]
+  - [
+      bash,
+      -lc,
+      "echo 'Cloud-Init: configuração concluída.' | tee /var/log/provisionamento-finalizado.log",
+    ]
 
 # Mensagem final registrada nos logs
 final_message: "Cloud-Init finalizado após $UPTIME segundos."
